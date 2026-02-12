@@ -17,7 +17,6 @@ public class AsyncProcessorTest {
 
         AsyncProcessor processor = new AsyncProcessor();
       CompletableFuture<String> resultFuture = processor.processAsync(List.of(mockService1, mockService2));
-//        CompletableFuture<String> resultFuture = processor.processAsync(Arrays.asList(mockService1, mockService2));
         CompletableFuture<String> resultFuture1 = processor.processAsyncFailFast(
                 Arrays.asList(mockService1, mockService2),
                 Arrays.asList("msg1", "msg2")
@@ -47,7 +46,7 @@ public class AsyncProcessorTest {
 
       
 }
-  //Checking that Test succesfully
+  //Checking that Test succesfully for Fail Fast
     @Test
     public void failFast_all_success() throws Exception {
     	 //pass ( shouldfail boolean= false)
@@ -62,10 +61,53 @@ public class AsyncProcessorTest {
         );
 
         assertEquals("HELLO WORLD", result.get(2, TimeUnit.SECONDS));
+    };
+  //Checking for Failure propagation for Fail Fast 
+    @Test
+    public void fail_Partial_results() throws Exception {
+     	//fail ( shouldfail boolean= true)
+        Microservice s1 = new FakeMicroService(true);
+        //pass ( shouldfail boolean= false)
+        Microservice s2 = new FakeMicroService(false);
+        
+        AsyncProcessor processor = new AsyncProcessor();
+
+        CompletableFuture<List<String>> result = processor.processAsyncFailPartial(
+                Arrays.asList(s1, s2),
+                Arrays.asList("message1", "message2")
+        );
+        //Partial result can be returned, since s1 Microservice failed result returns failed! 
+        List<String> expected = Arrays.asList("Failed!", "MESSAGE2");
+       //checks that the list matches the result fails within a timeout of 2 seconds
+        assertEquals(expected,  result.get(2, TimeUnit.SECONDS));
+        //Since failed is marked, it should not return any error
+        assertFalse(result.isCompletedExceptionally());
+        
+
+}
+    @Test
+    public void fail_Partial_successful_results() throws Exception {
+     	//pass ( shouldfail boolean= false)
+        Microservice s1 = new FakeMicroService(false);
+        //pass ( shouldfail boolean= false)
+        Microservice s2 = new FakeMicroService(false);
+        
+        AsyncProcessor processor = new AsyncProcessor();
+
+        CompletableFuture<List<String>> result = processor.processAsyncFailPartial(
+                Arrays.asList(s1, s2),
+                Arrays.asList("message1", "message2")
+        );
+      //Partial result can be returned, since s1 and s2 Microservice both pass result returns as expected
+        List<String> expected = Arrays.asList("MESSAGE1", "MESSAGE2");
+        assertEquals(expected,  result.get(2, TimeUnit.SECONDS));
+        //Since failed is marked, it should not return any error
+        assertFalse(result.isCompletedExceptionally());
+        
+
+      
+    
     }
-    
-    
-    
     
 
 }
