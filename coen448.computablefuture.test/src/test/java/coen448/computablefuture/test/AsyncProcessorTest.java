@@ -106,9 +106,57 @@ public class AsyncProcessorTest {
         
 
       
-    
     }
-    
+  //Checking for Failure propagation for Fail Fast 
+    @Test
+    public void fail_soft_with_fallback() throws Exception {
+     	//pass ( shouldfail boolean= false)
+        Microservice s1 = new FakeMicroService(false);
+        //fail ( shouldfail boolean= true)
+        Microservice s2 = new FakeMicroService(true);
+      //pass ( shouldfail boolean= false)
+        Microservice s3 = new FakeMicroService(false);
+        
+        AsyncProcessor processor = new AsyncProcessor();
+
+        //passing default as fallback value in case of failure
+        CompletableFuture<String> result = processor.processAsyncFailSoft(
+                Arrays.asList(s1, s2,s3),
+                Arrays.asList("message1", "message2", "message3"),
+                "default"
+        );
+        
+        //checking partial value is returned and all area of failure returns default in this case the s2 
+        assertEquals("MESSAGE1 default MESSAGE3",  result.get(2, TimeUnit.SECONDS));
+        //Since failure is handled with default value, it should not return any error.
+        assertFalse(result.isCompletedExceptionally());
+        
+
+}
+    //Checking all microservices passes with fallback
+    public void fail_soft_successfull_fallback() throws Exception {
+     	//pass ( shouldfail boolean= false)
+        Microservice s1 = new FakeMicroService(false);
+        //pass ( shouldfail boolean= false)
+        Microservice s2 = new FakeMicroService(false);
+      //pass ( shouldfail boolean= false)
+        Microservice s3 = new FakeMicroService(false);
+        
+        AsyncProcessor processor = new AsyncProcessor();
+
+        //passing default as fallback value in case of failure
+        CompletableFuture<String> result = processor.processAsyncFailSoft(
+                Arrays.asList(s1, s2,s3),
+                Arrays.asList("message1", "message2", "message3"),
+                "default"
+        );
+        
+        //checking partial value is returned and all area of failure returns default in this case the none with a timeout of 2second
+        assertEquals("MESSAGE1 MESSAGE2 MESSAGE3",  result.get(2, TimeUnit.SECONDS));
+
+        
+
+}
 
 }
 
