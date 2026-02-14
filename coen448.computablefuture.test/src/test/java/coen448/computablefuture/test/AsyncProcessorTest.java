@@ -24,6 +24,8 @@ public class AsyncProcessorTest {
         String result = resultFuture1.get();
         assertEquals("Hello World", result);
     }
+    
+    
    // ASSIGNMENT 1 3.2
 //Checking for Failure propagation for Fail Fast 
     @Test
@@ -46,7 +48,7 @@ public class AsyncProcessorTest {
 
       
 }
-  //Checking that Test succesfully for Fail Fast
+  //Checking that Test passes succesfully for  Fail Fast
     @Test
     public void failFast_all_success() throws Exception {
     	 //pass ( shouldfail boolean= false)
@@ -62,7 +64,11 @@ public class AsyncProcessorTest {
 
         assertEquals("HELLO WORLD", result.get(2, TimeUnit.SECONDS));
     };
-  //Checking for Failure propagation for Fail Fast 
+    
+    
+ // FAIL PARTIAL POLICY   TESTING
+    
+  //Checking for for Fail partial returned value and marked failed value
     @Test
     public void fail_Partial_results() throws Exception {
      	//fail ( shouldfail boolean= true)
@@ -85,6 +91,7 @@ public class AsyncProcessorTest {
         
 
 }
+    //Checking all partial returned value  with all successful microservices
     @Test
     public void fail_Partial_successful_results() throws Exception {
      	//pass ( shouldfail boolean= false)
@@ -107,7 +114,10 @@ public class AsyncProcessorTest {
 
       
     }
-  //Checking for Failure propagation for Fail Fast 
+    
+ // FAIL SOFT POLICY   TESTING
+    
+  //Checking for Failure propagation for Fail soft 
     @Test
     public void fail_soft_with_fallback() throws Exception {
      	//pass ( shouldfail boolean= false)
@@ -133,6 +143,7 @@ public class AsyncProcessorTest {
         
 
 }
+    @Test
     //Checking all microservices passes with fallback
     public void fail_soft_successfull_fallback() throws Exception {
      	//pass ( shouldfail boolean= false)
